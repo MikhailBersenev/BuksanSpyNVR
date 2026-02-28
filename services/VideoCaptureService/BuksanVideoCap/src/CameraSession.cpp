@@ -12,9 +12,11 @@ const int reconnect_delay_ms = 1000;
 }
 
 CameraSession::CameraSession(const CameraConfig& config,
-                             const std::string& storage_path)
+                             const std::string& storage_path,
+                             int segment_duration_sec)
     : config_(config)
     , storage_path_(storage_path)
+    , segment_duration_sec_(segment_duration_sec <= 0 ? 300 : segment_duration_sec)
     , analytics_(std::make_unique<Analytics>())
 {
 }
@@ -87,7 +89,7 @@ void CameraSession::run() {
                 }
             } else {
                 try {
-                    recorder_ = std::make_unique<Recorder>(config_.id, storage_path_, 300, fps, frame.size());
+                    recorder_ = std::make_unique<Recorder>(config_.id, storage_path_, segment_duration_sec_, fps, frame.size());
                     writer_started = true;
                     std::cout << "[" << config_.id << "] recording started" << std::endl;
                 } catch (const std::exception& e) {

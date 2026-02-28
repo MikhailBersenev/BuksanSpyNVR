@@ -80,3 +80,23 @@ CMakeLists.txt.user*
 .rcc/
 .uic/
 /build*/
+
+# CMake
+CMakeCache.txt
+CMakeFiles/
+cmake_install.cmake
+compile_commands.json
+*.cmake
+!CMakeLists*.txt
+_deps/
+
+# Build directories (out-of-source)
+build/
+build-*/
+build_*/
+
+# Third-party (клон репозитория Crow, в репо только third_party/crow/include)
+third_party/crow_src/
+
+# Local cache
+.cache/

@@ -16,7 +16,8 @@ class Analytics;
 class CameraSession {
 public:
     explicit CameraSession(const CameraConfig& config,
-                          const std::string& storage_path);
+                          const std::string& storage_path,
+                          int segment_duration_sec = 300);
 
     ~CameraSession();
 
@@ -31,6 +32,7 @@ private:
 
     CameraConfig config_;
     std::string storage_path_;
+    int segment_duration_sec_{300};
     std::unique_ptr<Recorder> recorder_;
     std::unique_ptr<Analytics> analytics_;
     cv::VideoCapture capture_;
