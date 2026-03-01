@@ -6,6 +6,22 @@ set(CMAKE_CXX_STANDARD 17)
 find_package(OpenCV REQUIRED core videoio)
 find_package(yaml-cpp REQUIRED)
 find_package(Threads REQUIRED)
+find_package(libpqxx CONFIG QUIET)
+
+if(TARGET libpqxx::pqxx)
+  set(PQXX_TARGET libpqxx::pqxx)
+elseif(TARGET pqxx::pqxx)
+  set(PQXX_TARGET pqxx::pqxx)
+else()
+  find_package(PkgConfig REQUIRED)
+  pkg_check_modules(LIBPQXX IMPORTED_TARGET libpqxx)
+  if(NOT LIBPQXX_FOUND)
+    message(FATAL_ERROR
+      "libpqxx is required for PostgreSQL metadata storage. "
+      "Install package 'libpqxx' and rerun CMake.")
+  endif()
+  set(PQXX_TARGET PkgConfig::LIBPQXX)
+endif()
 
 set(SRC
     src/main.cpp
@@ -15,6 +31,16 @@ set(SRC
     src/Recorder.cpp
     src/CameraSession.cpp
     core/CameraManager.cpp
+    db/IConnectionPool.cpp
+    db/PostgresConnectionPool.cpp
+    repositories/postgres/PostgresRecordingRepository.cpp
+    repositories/postgres/PostgresCameraRepository.cpp
+    repositories/postgres/PostgresNodeRepository.cpp
+    services/RecordingService.cpp
+    services/CameraService.cpp
+    services/NodeService.cpp
+    services/MetadataSyncWorker.cpp
+    utils/InMemoryMetadataSyncQueue.cpp
 )
 
 add_executable(BuksanSpyNVR ${SRC})
@@ -29,6 +55,7 @@ target_include_directories(BuksanSpyNVR PRIVATE
 target_link_libraries(BuksanSpyNVR PRIVATE
     ${OpenCV_LIBS}
     yaml-cpp
+    ${PQXX_TARGET}
 )
 
 # ------------------------------------------------------------------------------
